@@ -96,9 +96,31 @@ public class Scanner {
                 string();
                 break;
             default:
-                Lox.error(line, "Unexpected charactre.");
+                if (isDigit(c)) {
+                    number();
+                } else {
+                    Lox.error(line, "Unexpected charactre.");
+                }
                 break;
         }
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private void number() {
+        while (isDigit(peek()))
+            advance();
+
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance();
+
+            while (isDigit(peek()))
+                advance();
+        }
+
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
     private void string() {
@@ -135,6 +157,15 @@ public class Scanner {
         if (isAtEnd())
             return '\0';
         return source.charAt(current);
+    }
+
+    // 두글자 내다보기
+    private char peekNext() {
+        if (current + 1 >= source.length())
+            return '\0';
+        else
+            return source.charAt(current + 1);
+
     }
 
     private char advance() {
